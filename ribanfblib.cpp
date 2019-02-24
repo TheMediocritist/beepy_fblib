@@ -1,3 +1,8 @@
+/*  Simple framebuffer graphics library
+    Copyright:  riban 2019
+    Author:     Brian Walotn (brian@riban.co.uk)
+    License:    LGPL
+*/
 #include "ribanfblib.h"
 #include <assert.h> //Provides assert error checking
 #include <stdio.h>
