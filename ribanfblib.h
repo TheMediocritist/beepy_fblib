@@ -16,7 +16,7 @@
 #define QUADRANT_BOTTOM_RIGHT   0x02
 #define QUADRANT_BOTTOM_LEFT    0x04
 #define QUADRANT_TOP_LEFT       0x08
-#define QUADRANT_TOP            0x0A
+#define QUADRANT_TOP            0x09
 #define QUADRANT_BOTTOM         0x06
 #define QUADRANT_LEFT           0x0C
 #define QUADRANT_RIGHT          0x03
@@ -99,7 +99,7 @@ class ribanfblib
         *   @param  round Bitwise flag indicating which corners should be rounded [Default: None]
         *   @param  radius Radius of curved corners in pixels
         */
-        void DrawRect(int x1, int y1, int x2, int y2, uint32_t colour = WHITE, uint8_t border = 1, uint32_t fillColour = NO_FILL, uint8_t round = QUADRANT_NONE, int radius = 0);
+        void DrawRect(int x1, int y1, int x2, int y2, uint32_t colour = WHITE, uint8_t border = 1, uint32_t fillColour = NO_FILL, uint8_t round = QUADRANT_NONE, uint32_t radius = 0);
 
         /** @brief  Draw a triangle
         *   @param  x1 The horizontal offset of first point from left edge of screen
@@ -122,7 +122,7 @@ class ribanfblib
         *   @param  border The thickness of the line in pixels [Default: 1]
         *   @param  fillColour The colour to fill the shape with [Default: no fill]
         */
-        void DrawCircle(int x, int y, int radius, uint32_t colour = WHITE, uint8_t border = 1, uint32_t fillColour = NO_FILL);
+        void DrawCircle(int x, int y, uint32_t radius, uint32_t colour = WHITE, uint8_t border = 1, uint32_t fillColour = NO_FILL);
 
         /** @brief  Load a font to use for drawing text
         *   @param  height Font height
@@ -186,15 +186,13 @@ class ribanfblib
         */
         static std::string GetVisual(uint32_t visual);
 
-        bool m_bFast;
-
     protected:
 
     private:
         void drawBitmap(FT_Bitmap* bitmap, int x, int y, uint32_t colour);
         int drawChar(char c, int x, int y, int colour); //low level draw character from font, returns x coord of next character
         void drawLine(int x1, int y1, int x2, int y2, uint32_t colour); //Bresenham's line algorithm
-        void drawQuadrant(int x0, int y0, int radius, uint32_t colour, uint8_t border, uint8_t quadrant = QUADRANT_ALL); //Draw each circle quadrant indicated by 4-bit (LSB) of quadrant
+        void drawQuadrant(int x0, int y0, uint32_t radius, uint32_t colour, uint8_t border, uint8_t quadrant = QUADRANT_ALL); //Draw each circle quadrant indicated by 4-bit (LSB) of quadrant
 
         int m_nLineLength; //Bytes in each line of framebuffer memory map (width x bbp)
         struct fb_var_screeninfo m_fbVarScreeninfo; //Framebuffer variable sceen info structure

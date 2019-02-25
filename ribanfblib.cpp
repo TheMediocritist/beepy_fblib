@@ -27,8 +27,6 @@ ribanfblib::ribanfblib(const char* device)
     m_nFtFace = -1;
     if(FT_Init_FreeType(&m_ftLibrary) == 0)
     {
-        //!@todo Validate type checking
-        //!@todo Try setting required depth / resolution / etc.
         if(m_fbFixScreeninfo.type == FB_TYPE_PACKED_PIXELS && // Only support packed pixels
            (m_fbFixScreeninfo.visual == FB_VISUAL_TRUECOLOR | m_fbFixScreeninfo.visual == FB_VISUAL_DIRECTCOLOR)) //Only support truecolor | directcolor
            {
@@ -45,7 +43,6 @@ ribanfblib::ribanfblib(const char* device)
         printf("ERROR: Failed to initiate framebuffer - (%dx%d) %dbpp %s %s not supported by this library\n",
                GetWidth(), GetHeight(), GetDepth(), GetType(m_fbFixScreeninfo.type).c_str(), GetVisual(m_fbFixScreeninfo.visual).c_str()); //!@todo Remove this debug message
     SetFont(16, 16, "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
-    m_bFast = false;
 }
 
 ribanfblib::~ribanfblib()
@@ -171,7 +168,7 @@ void ribanfblib::drawLine(int x1, int y1, int x2, int y2, uint32_t colour)
     }
 }
 
-void ribanfblib::DrawRect(int x1, int y1, int x2, int y2, uint32_t colour, uint8_t border, uint32_t fillColour, uint8_t round, int radius)
+void ribanfblib::DrawRect(int x1, int y1, int x2, int y2, uint32_t colour, uint8_t border, uint32_t fillColour, uint8_t round, uint32_t radius)
 {
     //!@todo Validate rounded corners implementation
     if(fillColour != NO_FILL)
@@ -256,100 +253,104 @@ void ribanfblib::DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, ui
     DrawLine(x3, y3, x1, y1, colour, border);
 }
 
-void ribanfblib::DrawCircle(int x0, int y0, int radius, uint32_t colour, uint8_t border, uint32_t fillColour)
+void ribanfblib::DrawCircle(int x0, int y0, uint32_t radius, uint32_t colour, uint8_t border, uint32_t fillColour)
 {
     if(fillColour != NO_FILL)
     {
-        int xoff = 0;
-        int yoff = radius;
+        int nXoffset = 0;
+        int nYoffset = radius;
         int balance = -radius;
 
-        while(xoff <= yoff)
+        while(nXoffset <= nYoffset) //iterate between 0 and radius
         {
-            int p0 = x0 - xoff;
-            int p1 = x0 - yoff;
+            int p0 = x0 - nXoffset; //x component of point on circumference LHS
+            int p1 = x0 - nYoffset; //x component of point on circumference RHS
 
-            int w0 = xoff + xoff;
-            int w1 = yoff + yoff;
+            int w0 = nXoffset + nXoffset; //width of circle at current y position (top / bottom quarter)
+            int w1 = nYoffset + nYoffset; //width of circle at current y position (middle quarters)
 
-            DrawLine(p0, y0 + yoff, p0 + w0, y0 + yoff, fillColour);
-            DrawLine(p0, y0 - yoff, p0 + w0, y0 - yoff, fillColour);
+            DrawLine(p0, y0 + nYoffset, p0 + w0, y0 + nYoffset, fillColour); //Horizontal line in lower quarter
+            DrawLine(p0, y0 - nYoffset, p0 + w0, y0 - nYoffset, fillColour); //Horizontal line in upper quarter
 
-            DrawLine(p1, y0 + xoff, p1 + w1, y0 + xoff, fillColour);
-            DrawLine(p1, y0 - xoff, p1 + w1, y0 - xoff, fillColour);
+            DrawLine(p1, y0 + nXoffset, p1 + w1, y0 + nXoffset, fillColour); //Horizontal line in lower half
+            DrawLine(p1, y0 - nXoffset, p1 + w1, y0 - nXoffset, fillColour); //Horizontal line in upper half
 
-            if((balance += xoff++ + xoff) >= 0)
+            if((balance += nXoffset++ + nXoffset) >= 0)
             {
-                balance -= --yoff + yoff;
+                balance -= --nYoffset + nYoffset;
             }
         }
     }
     drawQuadrant(x0, y0, radius, colour, border);
 }
 
-void ribanfblib::drawQuadrant(int x0, int y0, int radius, uint32_t colour, uint8_t border, uint8_t quadrant)
+void ribanfblib::drawQuadrant(int x0, int y0, uint32_t radius, uint32_t colour, uint8_t border, uint8_t quadrant)
 {
-    bool bQ1 = (quadrant & QUADRANT_TOP_RIGHT == QUADRANT_TOP_RIGHT);
-    bool bQ2 = (quadrant & QUADRANT_BOTTOM_RIGHT == QUADRANT_BOTTOM_RIGHT);
-    bool bQ3 = (quadrant & QUADRANT_BOTTOM_LEFT == QUADRANT_BOTTOM_LEFT);
-    bool bQ4 = (quadrant & QUADRANT_TOP_LEFT == QUADRANT_TOP_LEFT);
-    //Paint the top, bottom, left and right points that the simplified circle algorithm misses
-    if(bQ1)
+    bool bQ1 = ((quadrant & QUADRANT_TOP_RIGHT) == QUADRANT_TOP_RIGHT);
+    bool bQ2 = ((quadrant & QUADRANT_BOTTOM_RIGHT) == QUADRANT_BOTTOM_RIGHT);
+    bool bQ3 = ((quadrant & QUADRANT_BOTTOM_LEFT) == QUADRANT_BOTTOM_LEFT);
+    bool bQ4 = ((quadrant & QUADRANT_TOP_LEFT) == QUADRANT_TOP_LEFT);
+    //Draw concentric circles to width of border
+    for(int nRadius = radius; nRadius > radius - border; --nRadius)
     {
-        DrawLine(x0, y0 + radius, x0, y0 + radius + border - 1, colour); //Top
-        DrawLine(x0 + radius, y0, x0 + radius + border - 1, y0, colour); //Right
-    }
-    if(bQ2)
-    {
-        DrawLine(x0 + radius, y0, x0 + radius + border - 1, y0, colour); //Right
-        DrawLine(x0, y0 - radius, x0, y0 - radius - border + 1, colour); //Bottom
-    }
-    if(bQ3)
-    {
-        DrawLine(x0, y0 - radius, x0, y0 - radius - border + 1, colour); //Bottom
-        DrawLine(x0 - radius, y0, x0 - radius - border + 1, y0, colour); //Left
-    }
-    if(bQ4)
-    {
-        DrawLine(x0 - radius, y0, x0 - radius - border + 1, y0, colour); //Left
-        DrawLine(x0, y0 + radius, x0, y0 + radius + border - 1, colour); //Top
-    }
-
-    int f = 1 - radius;
-    int ddF_x = 0;
-    int ddF_y = -2 * radius;
-    int x = 0;
-    int y = radius;
-    while(x < y)
-    {
-        if(f >= 0)
-        {
-            y--;
-            ddF_y += 2;
-            f += ddF_y;
-        }
-        x++;
-        ddF_x += 2;
-        f += ddF_x + 1;
+        //Paint the top, bottom, left and right points that the simplified circle algorithm misses
         if(bQ1)
         {
-            DrawLine(x0 + x, y0 - y, x0 + x + border, y0 - y - border + 1, colour); //0-45
-            DrawLine(x0 + y, y0 - x, x0 + y + border, y0 - x - border + 1, colour); //45-90
+            DrawPixel(x0, y0 - nRadius, colour); //Top
+            DrawPixel(x0 + nRadius, y0, colour); //Right
         }
         if(bQ2)
         {
-            DrawLine(x0 + y, y0 + x, x0 + y + border, y0 + x + border - 1, colour); //90-135
-            DrawLine(x0 + x, y0 + y, x0 + x + border, y0 + y + border - 1, colour); //135-180
+            DrawPixel(x0 + nRadius, y0, colour); //Right
+            DrawPixel(x0, y0 + nRadius, colour); //Bottom
         }
         if(bQ3)
         {
-            DrawLine(x0 - x, y0 + y, x0 - x - border, y0 + y + border - 1, colour); //180-225
-            DrawLine(x0 - y, y0 + x, x0 - y - border, y0 + x + border - 1, colour); //225-270
+            DrawPixel(x0, y0 + nRadius, colour); //Bottom
+            DrawPixel(x0 - nRadius, y0, colour); //Left
         }
         if(bQ4)
         {
-            DrawLine(x0 - y, y0 - x, x0 - y - border, y0 - x - border + 1, colour); //270-325
-            DrawLine(x0 - x, y0 - y, x0 - x - border, y0 - y - border + 1, colour); //325-360
+            DrawPixel(x0 - nRadius, y0, colour); //Left
+            DrawPixel(x0, y0 - nRadius, colour); //Top
+        }
+
+        int f = 1 - nRadius;
+        int ddF_x = 0;
+        int ddF_y = -2 * nRadius;
+        int x = 0;
+        int y = nRadius;
+        while(x < y)
+        {
+            if(f >= 0)
+            {
+                y--;
+                ddF_y += 2;
+                f += ddF_y;
+            }
+            x++;
+            ddF_x += 2;
+            f += ddF_x + 1;
+            if(bQ1)
+            {
+                DrawPixel(x0 + x, y0 - y, colour); //0-45
+                DrawPixel(x0 + y, y0 - x, colour); //45-90
+            }
+            if(bQ2)
+            {
+                DrawPixel(x0 + y, y0 + x, colour); //90-135
+                DrawPixel(x0 + x, y0 + y, colour); //135-180
+            }
+            if(bQ3)
+            {
+                DrawPixel(x0 - x, y0 + y, colour); //180-225
+                DrawPixel(x0 - y, y0 + x, colour); //225-270
+            }
+            if(bQ4)
+            {
+                DrawPixel(x0 - y, y0 - x, colour); //270-325
+                DrawPixel(x0 - x, y0 - y, colour); //325-360
+            }
         }
     }
 }
