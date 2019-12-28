@@ -33,11 +33,15 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Makefile.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="colours.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ribanfblib.cpp" />
 		<Unit filename="ribanfblib.h" />
+		<Unit filename="test.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
