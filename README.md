@@ -22,7 +22,7 @@ The main purpose of this library is to provide a simple user interface on a smal
 # Dependencies
 
 * Freetype
-* Arash Partow's bitmap library (https://github.com/ArashPartow/bitmap/blob/master/bitmap_image.hpp)
+* Arash Partow's bitmap library (https://raw.githubusercontent.com/ArashPartow/bitmap/master/bitmap_image.hpp)
 
 To build an application called *fbtest* from a source file called main.cpp use the following command:
 
