@@ -6,7 +6,7 @@
 #pragma once
 
 #include "colours.h" //Preset colours
-#include "bitmap_image.hpp" //Provides bitmap manipulation
+#include "bitmap/bitmap_image.hpp" //Provides bitmap manipulation
 #include <stdint.h> //Provides fixed size int types
 #include <string> //Provides std::string
 #include <map> // Provides std::map
