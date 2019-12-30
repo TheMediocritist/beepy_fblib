@@ -1,11 +1,12 @@
 CXX = g++
 LIBS = -lfreetype
+CFLAGS = -I/usr/include/freetype2
 src = $(wildcard *.cpp)
 obj = $(src:.cpp=.o)
 dep = $(obj:.o=.d)
 
 fbtest: $(obj)
-	$(CXX) -o $@ $(LIBS) $^
+	$(CXX) -o $@ $(LIBS) $(CFLAGS) $^
 
 -include $(dep)
 
