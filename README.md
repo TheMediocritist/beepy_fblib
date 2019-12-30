@@ -11,6 +11,7 @@ Shapes provided by the library are:
 * Rectangle
 * Circle
 * Text
+* Bitmap
 
 Each shape may have a border of configurable thickness and colour and fill colour. Rectangles may have any of its corners curved. Text may use any font supported by FreeType and be sized and rotated.
 
@@ -21,9 +22,23 @@ The main purpose of this library is to provide a simple user interface on a smal
 # Dependencies
 
 * Freetype
+* Arash Partow's bitmap library (https://github.com/ArashPartow/bitmap/blob/master/bitmap_image.hpp)
 
 To build an application called *fbtest* from a source file called main.cpp use the following command:
 
 ` g++ -o fbtest -I/usr/include/freetype2 -lfreetype main.cpp ribanfblib.cpp`
 
 (This assumes freetype2 include files are located in /usr/include/freetype2 and libfreetype.o (or libfreetype.so) is in the linker path. Adjust to suit.)
+
+# Shared Library
+
+The library may be compiled as a shared library:
+
+```
+g++ -fpic -c -Wall -Werror -I/usr/include/freetype2 ribanfblib.cpp
+g++ -shared ribanfblib.o -lfreetype -lstdc++ -o libribanfb.so
+sudo cp libribanfb.so /usr/local/lib
+sudo ldconfig /usr/local/lib
+```
+
+TODO: Create Makefile to perform these actions and compile test application.
