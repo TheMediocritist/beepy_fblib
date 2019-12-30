@@ -6,8 +6,10 @@
 #pragma once
 
 #include "colours.h" //Preset colours
+#include "bitmap_image.hpp" //Provides bitmap manipulation
 #include <stdint.h> //Provides fixed size int types
 #include <string> //Provides std::string
+#include <map> // Provides std::map
 #include <linux/fb.h> //Provides framebuffer
 #include <ft2build.h> //Provides freetype 2
 #include FT_FREETYPE_H //Macro provides freetype 2 header
@@ -145,6 +147,21 @@ class ribanfblib
         */
         void DrawText(std::string sText, int x, int y, uint32_t colour = WHITE, float angle = 0);
 
+	/** @brief Load a bitmap into memory
+	*   @param sFilename Full path and filename of bitmap file to load
+	*   @param sName Name to use to refer to bitmap
+	*   @retval bool True on success
+	*/
+	bool LoadBitmap(std::string sFilename, std::string sName);
+
+	/** @brief Draw bitmap
+	*   @param sName Name of a preloaded bitmap
+	*   @param x X coordinate of top left corner
+	*   @param y Y coordinate of top left corner
+	*   @retval bool True on success
+	*/
+	bool DrawBitmap(std::string sName, int x, int y);
+
         /** @brief  Get a colour value based on the specified colour depth
         *   @param  red Red component
         *   @param  green Green component
@@ -162,6 +179,12 @@ class ribanfblib
         *   @retval uint32_t 32-bit colour value
         */
         static uint32_t GetColour32(uint8_t red, uint8_t green, uint8_t blue);
+
+        /** @brief  Get a 32-bit colour value from bitmap_image colour value
+        *   @param  colour rgb_t 24-bit colour value
+        *   @retval uint32_t 32-bit colour value
+        */
+        static uint32_t GetColour32(rgb_t colour);
 
         /** @brief  Get a colour at the specified depth from a 32-bit colour value
         *   @param  colour32 32-bit colour value
@@ -213,6 +236,8 @@ class ribanfblib
         FT_Face m_ftFace; //Freetype typeface
         int m_nFtLibInit; // 0 if Freetype library successfully initialised
         int m_nFtFace; // 0 if Freetype typeface loaded
+
+	std::map<std::string,bitmap_image*> m_mmBitmaps; // Map of loaded bitmaps
 };
 
 }

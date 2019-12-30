@@ -51,6 +51,8 @@ ribanfblib::~ribanfblib()
     close(m_nFbHandle);
     if(m_nFtLibInit)
         FT_Done_FreeType(m_ftLibrary);
+    for(auto it=m_mmBitmaps.begin(); it != m_mmBitmaps.end(); ++it)
+        delete it->second;
 }
 
 bool ribanfblib::IsReady()
@@ -400,6 +402,34 @@ void ribanfblib::DrawText(std::string text, int x, int y, uint32_t colour, float
     }
 }
 
+bool ribanfblib::LoadBitmap(std::string sFilename, std::string sName)
+{
+    bitmap_image* pImage =  new bitmap_image(sFilename);
+    if(!pImage)
+        return false;
+    auto it = m_mmBitmaps.find(sName);
+    if(it != m_mmBitmaps.end())
+        delete it->second;
+    m_mmBitmaps[sName] = pImage;
+    return true;
+}
+
+bool ribanfblib::DrawBitmap(std::string sName, int x, int y)
+{
+    auto it = m_mmBitmaps.find(sName);
+    if(it == m_mmBitmaps.end())
+        return false; //bitmap not loaded
+    bitmap_image* pImage = it->second;
+    for(unsigned int y = 0; y < pImage->height(); ++y)
+        for(unsigned int x = 0; x < pImage->width(); ++x)
+        {
+            rgb_t colour;
+            pImage->get_pixel(x, y, colour);
+            DrawPixel(x, y, GetColour32(colour));
+        }
+    return true;
+}
+
 void ribanfblib::drawBitmap(FT_Bitmap* bitmap, int x, int y, uint32_t colour)
 {
     int nYmin = 0;
@@ -431,6 +461,7 @@ void ribanfblib::drawBitmap(FT_Bitmap* bitmap, int x, int y, uint32_t colour)
     }
 }
 
+
 uint32_t ribanfblib::GetColour(uint8_t red, uint8_t green, uint8_t blue, uint8_t depth)
 {
     if(depth == 0)
@@ -443,6 +474,11 @@ uint32_t ribanfblib::GetColour(uint8_t red, uint8_t green, uint8_t blue, uint8_t
 uint32_t ribanfblib::GetColour32(uint8_t red, uint8_t green, uint8_t blue)
 {
     return (red << 16) | (green << 8) | (blue);
+}
+
+uint32_t ribanfblib::GetColour32(rgb_t colour)
+{
+    return GetColour32(colour.red, colour.green, colour.blue);
 }
 
 uint32_t ribanfblib::GetColour(uint32_t colour32, uint8_t depth)
