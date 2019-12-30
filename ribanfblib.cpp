@@ -28,7 +28,7 @@ ribanfblib::ribanfblib(const char* device)
     if(FT_Init_FreeType(&m_ftLibrary) == 0)
     {
         if(m_fbFixScreeninfo.type == FB_TYPE_PACKED_PIXELS && // Only support packed pixels
-           (m_fbFixScreeninfo.visual == FB_VISUAL_TRUECOLOR | m_fbFixScreeninfo.visual == FB_VISUAL_DIRECTCOLOR)) //Only support truecolor | directcolor
+           ((m_fbFixScreeninfo.visual == FB_VISUAL_TRUECOLOR) | (m_fbFixScreeninfo.visual == FB_VISUAL_DIRECTCOLOR))) //Only support truecolor | directcolor
            {
                m_nFtLibInit = 0;
                m_nRedMask = ((1 << m_fbVarScreeninfo.red.length) - 1) << (24 - m_fbVarScreeninfo.red.length);
@@ -198,7 +198,7 @@ void ribanfblib::DrawRect(int x1, int y1, int x2, int y2, uint32_t colour, uint8
 
 }
 
-void ribanfblib::DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, uint32_t colour, uint8_t border, int32_t fillColour)
+void ribanfblib::DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, uint32_t colour, uint8_t border, uint32_t fillColour)
 {
     if(fillColour != NO_FILL)
     {
@@ -275,9 +275,11 @@ void ribanfblib::DrawCircle(int x0, int y0, uint32_t radius, uint32_t colour, ui
             DrawLine(p1, y0 + nXoffset, p1 + w1, y0 + nXoffset, fillColour); //Horizontal line in lower half
             DrawLine(p1, y0 - nXoffset, p1 + w1, y0 - nXoffset, fillColour); //Horizontal line in upper half
 
-            if((balance += nXoffset++ + nXoffset) >= 0)
+            ++nXoffset;
+            if((balance += nXoffset) >= 0)
             {
-                balance -= --nYoffset + nYoffset;
+                --nYoffset;
+                balance -= nYoffset;
             }
         }
     }
@@ -291,7 +293,7 @@ void ribanfblib::drawQuadrant(int x0, int y0, uint32_t radius, uint32_t colour, 
     bool bQ3 = ((quadrant & QUADRANT_BOTTOM_LEFT) == QUADRANT_BOTTOM_LEFT);
     bool bQ4 = ((quadrant & QUADRANT_TOP_LEFT) == QUADRANT_TOP_LEFT);
     //Draw concentric circles to width of border
-    for(int nRadius = radius; nRadius > radius - border; --nRadius)
+    for(unsigned int nRadius = radius; nRadius > radius - border; --nRadius)
     {
         //Paint the top, bottom, left and right points that the simplified circle algorithm misses
         if(bQ1)
@@ -387,12 +389,11 @@ void ribanfblib::DrawText(std::string text, int x, int y, uint32_t colour, float
     pen.x = x * 64;
     pen.y = (GetHeight() - y) * 64;
 
-    for(int n = 0; n < text.length(); ++n)
+    for(unsigned int n = 0; n < text.length(); ++n)
     {
         FT_Set_Transform(m_ftFace, &matrix, &pen);
         if(FT_Load_Char(m_ftFace, text[n], FT_LOAD_RENDER | FT_LOAD_MONOCHROME))
             continue;
-        FT_Bitmap bitmap = slot->bitmap;
         drawBitmap(&slot->bitmap, slot->bitmap_left, GetHeight() - slot->bitmap_top, colour);
         pen.x += slot->advance.x;
         pen.y += slot->advance.y;
@@ -446,7 +447,6 @@ uint32_t ribanfblib::GetColour32(uint8_t red, uint8_t green, uint8_t blue)
 
 uint32_t ribanfblib::GetColour(uint32_t colour32, uint8_t depth)
 {
-    uint32_t nValue = colour32;
     switch(depth)
     {
     case 8: //332

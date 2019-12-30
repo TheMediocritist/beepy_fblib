@@ -24,6 +24,8 @@
 #define QUADRANT_NONE           0x00
 #define NO_FILL                 0xFFFFFFFF
 
+extern "C" {
+
 /** Class provides simple graphic element drawing to the framebuffer.
     All coordinates are in screen orientation starting with (0,0) at top left.
     Colours are 32-bit ARGB but alpha channel should be set to zero (used for internal flags).
@@ -112,7 +114,7 @@ class ribanfblib
         *   @param  border The thickness of the line in pixels [Default: 1]
         *   @param  fillColour The colour to fill the shape with [Default: no fill]
         */
-        void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, uint32_t colour = WHITE, uint8_t border = 1, int32_t fillColour = NO_FILL);
+        void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, uint32_t colour = WHITE, uint8_t border = 1, uint32_t fillColour = NO_FILL);
 
         /** @brief  Draw a circle
         *   @param  x The horizontal offset of centre from left edge of screen
@@ -212,3 +214,5 @@ class ribanfblib
         int m_nFtLibInit; // 0 if Freetype library successfully initialised
         int m_nFtFace; // 0 if Freetype typeface loaded
 };
+
+}
