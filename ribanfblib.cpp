@@ -173,15 +173,15 @@ void ribanfblib::drawLine(int x1, int y1, int x2, int y2, uint32_t colour)
 void ribanfblib::DrawRect(int x1, int y1, int x2, int y2, uint32_t colour, uint8_t border, uint32_t fillColour, uint8_t round, uint32_t radius)
 {
     //!@todo Validate rounded corners implementation
+    if(x1 > x2)
+        std::swap(x1, x2);
+    if(y1 > y2)
+        std::swap(y1, y2);
     if(fillColour != NO_FILL)
     {
         for(int nRow = y1 + border; nRow < y2 - border + 1; ++nRow)
             DrawLine(x1 + border, nRow, x2 - border + 1, nRow, fillColour);
     }
-    if(x1 > x2)
-        std::swap(x1, x2);
-    if(y1 > y2)
-        std::swap(y1, y2);
     DrawLine(x1 + radius, y1, x2 - radius, y1, colour, border); //Top
     DrawLine(x1 + radius, y2 - border + 1, x2 - radius, y2 - border + 1, colour, border); //Bottom
     DrawLine(x1, y1 + radius, x1, y2 - radius, colour, border); //Left
