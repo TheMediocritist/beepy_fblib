@@ -179,7 +179,7 @@ void ribanfblib::DrawRect(int x1, int y1, int x2, int y2, uint32_t colour, uint8
         std::swap(y1, y2);
     if(fillColour != NO_FILL)
     {
-        for(int nRow = y1 + border; nRow < y2 - border + 1; ++nRow)
+        for(int nRow = y1 + border; nRow <= y2 - border; ++nRow)
             DrawLine(x1 + border, nRow, x2 - border + 1, nRow, fillColour);
     }
     DrawLine(x1 + radius, y1, x2 - radius, y1, colour, border); //Top
