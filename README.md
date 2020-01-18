@@ -28,7 +28,7 @@ To build an application called *fbtest* from a source file called main.cpp use t
 
 ` g++ -o fbtest -I/usr/include/freetype2 -lfreetype main.cpp ribanfblib.cpp`
 
-(This assumes freetype2 include files are located in /usr/include/freetype2 and libfreetype.o (or libfreetype.so) is in the linker path. Adjust to suit.)
+(This assumes freetype2 include files are located in /usr/include/freetype2 and libfreetype.a (or libfreetype.so) is in the linker path. Adjust to suit.)
 
 # Shared Library
 
