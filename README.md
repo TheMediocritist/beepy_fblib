@@ -15,7 +15,7 @@ Shapes provided by the library are:
 
 Each shape may have a border of configurable thickness and colour and fill colour. Rectangles may have any of its corners curved. Text may use any font supported by FreeType and be sized and rotated.
 
-Coordinates are inverted cartesian, i.e. (0,0) is at the top left of the screen. Coordinate of text is to the bottom left of the start of the text. Text rotation angle is in degrees.
+Coordinates are inverted cartesian, i.e. (0,0) is at the top left of the screen. Coordinate of text is to the bottom left of the start of the text. Text rotation angle is in degrees, anticlockwise from horizontal orientation.
 
 The main purpose of this library is to provide a simple user interface on a small TFT screen. Having searched for an existing toolkit I found there were feature-rich (and hence large and complex) toolkits such as wxWidgets, QT, etc. and there were low-level libraries requiring excessive coding. There were some that might meet my requirements but they were heavy on dependencies or complex to configure. The aim of this library is to be simple to use. It is not optimised for speed and does not purport to be a complete or advance toolkit. I am open to suggestes for improvement but do not intend to extend this library towards the feature set of existing larger libraries.
 
