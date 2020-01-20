@@ -18,3 +18,4 @@
 #define PURPLE          0x800080
 #define TEAL            0x008080
 #define DARK_BLUE       0x000080
+#define ORANGE			0xffae00
