@@ -18,4 +18,9 @@
 #define PURPLE          0x800080
 #define TEAL            0x008080
 #define DARK_BLUE       0x000080
-#define ORANGE			0xffae00
+#define ORANGE		  	  0xffae00
+// Beepy colours
+#define LIGHT_GREY      0xC0C0C0
+#define MEDIUM_GREY     0x808080
+#define DARK_GREY       0x404040
+
